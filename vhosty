@@ -1,0 +1,56 @@
+#!/bin/bash
+
+WEB_CONF_ROOT="/var/www"
+WEB_SERVER_CONFIG_TEMPLATE_PATH=""
+VHROOT="$WEB_CONF_ROOT/vhosts"
+BACKUPROOT="/var/backups"
+MYSQL_SERVER_ADRESS="127.0.0.1"
+MYSQL_ROOT_PASS="secret_password"
+
+hostname=""
+CMD=""
+hosttpl=""
+
+usage() {
+	echo "USAGE: $0 -c -h <HOST_NAME> -t <WEB_SERVER_CONFIG_TEMPLATE>"
+	echo "USAGE: $0 -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
+	echo "USAGE: $0 -d -h <HOST_NAME>"
+	echo -e "Options:"
+	echo -e "\t-c Create virtual host."
+	echo -e "\t-c Update existing virtual host."
+	echo -e "\t-c Delete existing virtual host."
+	echo -e "\t-h <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
+	echo -e "\t-t <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\tExample: wolfcms,yii,cohana"
+}
+
+printError() {
+	echo "[!] Invalid option" && usage && exit 1
+}
+
+loadConfig() {
+	#todo
+}
+
+main() {
+	#todo
+}
+
+while getopts "cduh:t:" Option; do
+	case $Option in
+			c ) CMD="create"
+			d ) CMD="delete"
+			u ) CMD="update"
+			h ) hostname="$OPTARG";;
+			t ) hosttpl="$OPTARG";;
+			* ) printError;;
+	esac
+done
+
+if [ "$command" != "" -a "$hostname" != "" ]
+then
+	main
+else
+	printError
+fi
+
+exit 0
