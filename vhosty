@@ -58,6 +58,7 @@ loadConfig() {
 }
 
 main() {
+	if[ "$CMD" == "create"] && $
 	#todo
 }
 
@@ -72,7 +73,7 @@ while getopts "cduh:t:" Option; do
 	esac
 done
 
-if [ "$command" != "" -a "$hostname" != "" ]
+if [ "$CMD" != "" -a "$hostname" != "" ]
 then
 	main
 else

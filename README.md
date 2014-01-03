@@ -17,6 +17,13 @@ I using self writing script for copy bin files into jail-root.
 - **Link**: [https://raw.github.com/gudron/jailcoopy/master/jailcopy](https://raw.github.com/gudron/jailcoopy/master/jailcopy)
 - **Repo**: [https://github.com/gudron/jailcoopy](https://github.com/gudron/jailcoopy)
 
+#### Nginxconfy
+
+This is just templates of nginx config for cms's amd frameworks.
+
+- **Name**: nginxconfy
+- **Repo**: [https://github.com/gudron/nginxconfy](https://github.com/gudron/nginxconfy)
+
 ### Installation
 
 On unix-like opearation systems:
