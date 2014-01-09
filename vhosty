@@ -1,15 +1,37 @@
 #!/bin/bash
+# ----------------------------------------------------------------------
+#    Copyright (c) 2014
+#
+#    This program is free software; you can redistribute it and/or
+#    modify it under the terms of version 3 of the GNU General Public
+#    License published by the Free Software Foundation.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+# ----------------------------------------------------------------------
+# Authors:
+#  Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
+#
+# /usr/local/bin/vhosty
+VHOSTY_CONFIG_FILE_PATH="/etc/vhosty.ini" #
 
-WEB_CONF_ROOT="/var/www"
-WEB_SERVER_CONFIG_TEMPLATE_PATH=""
-VHROOT="$WEB_CONF_ROOT/vhosts"
-BACKUPROOT="/var/backups"
-MYSQL_SERVER_ADRESS="127.0.0.1"
-MYSQL_ROOT_PASS="secret_password"
+# WEB_CONF_ROOT="/var/www"
+# WEB_SERVER_CONFIG_TEMPLATE_PATH=""
+# VIRTUAL_HOSTS_FOLDER_NAME="vhosts"
+
+# BACKUPROOT="/var/backups"
+# MYSQL_SERVER_ADRESS="127.0.0.1"
+# MYSQL_ROOT_PASS="secret_password"
 
 hostname=""
 CMD=""
 hosttpl=""
+password=""
+databasePassword=""
+execPath=""
 
 #thx2 ajdiaz. This function get from http://ajdiaz.wordpress.com/2008/02/09/bash-ini-parser/
 cfg_parser ()
@@ -38,15 +60,14 @@ usage() {
 	echo "USAGE: $0 -c -h <HOST_NAME> --password <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE>"
 	echo "USAGE: $0 -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
 	echo "USAGE: $0 -d -h <HOST_NAME>"
-	echo -e "Short options:"
-	echo -e "\t-c Create virtual host."
-	echo -e "\t-c Update existing virtual host."
-	echo -e "\t-c Delete existing virtual host."
-	echo -e "\t-h <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
-	echo -e "\t-t <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\tExample: wolfcms,yii,cohana"
-	echo -e "Long options:"
-	echo -e "\t--password Set password on database and system user"
-	echo -e "\t--database-password Set password on database only"
+	echo -e "Options:"
+	echo -e "\t-c | --create Create virtual host."
+	echo -e "\t-u | --update Update existing virtual host."
+	echo -e "\t-d | --delete Delete existing virtual host."
+	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
+	echo -e "\t-P | --password Set password on database and system user"
+	echo -e "\t-p | --database-password Set password on database and system user"
+	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
 }
 
 printError() {
@@ -54,22 +75,49 @@ printError() {
 }
 
 loadConfig() {
-	#todo
+	cfg_parser "$VHOSTY_CONFIG_FILE_PATH"
+	cfg.section.main
+	cfg.section.database
 }
 
 main() {
-	if[ "$CMD" == "create"] && $
-	#todo
+	execPath=`pwd`
+	loadConfig
+	parameters="--host $hostname"
+	case $CMD in
+		"create" )
+		if [ "$hosttpl" != "" ]
+		then
+			parameters="$parameters --template $hosttpl"
+			if [ "$password" != "" ]
+			then
+				parameters="$parameters --password $password"
+			fi
+
+			if [ "$databasePassword" != "" ]
+			then
+				parameters="$parameters --database-password $databasePassword"
+			fi
+			echo "$parameters"
+			bash -c "$execPath/vhosty-create-host $parameters"
+		fi
+		;;
+		"delete" )
+		bash -c "$execPath/vhosty-delete-host $parameters"
+		;;
+		"update" )
+		;;
+	esac
 }
 
 while getopts "cduh:t:" Option; do
 	case $Option in
-			c ) CMD="create"
-			d ) CMD="delete"
-			u ) CMD="update"
-			h ) hostname="$OPTARG";;
-			t ) hosttpl="$OPTARG";;
-			* ) printError;;
+		c ) CMD="create";;
+		d ) CMD="delete";;
+		u ) CMD="update";;
+		h ) hostname="$OPTARG";;
+		t ) hosttpl="$OPTARG";;
+		* ) printError;;
 	esac
 done
 

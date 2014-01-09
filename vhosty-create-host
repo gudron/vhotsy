@@ -1,1 +1,55 @@
 #!/bin/bash
+# ----------------------------------------------------------------------
+#    Copyright (c) 2014
+#
+#    This program is free software; you can redistribute it and/or
+#    modify it under the terms of version 3 of the GNU General Public
+#    License published by the Free Software Foundation.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+# ----------------------------------------------------------------------
+# Authors:
+#  Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
+#
+# /usr/local/bin/vhosty-create-host
+
+usage() {
+	echo "USAGE: $0 -c -h <HOST_NAME> --password <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE>"
+	echo "USAGE: $0 -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
+	echo "USAGE: $0 -d -h <HOST_NAME>"
+	echo -e "Options:"
+	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
+	echo -e "\t-P | --password Set password on database and system user"
+	echo -e "\t-p | --database-password Set password on database and system user"
+	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
+}
+
+printError() {
+	echo "[!] Invalid option" && usage && exit 1
+}
+
+main() {
+	echo main
+	#todo
+}
+
+while getopts "h:t:" Option; do
+	case $Option in
+		h ) hostname="$OPTARG";;
+		t ) hosttpl="$OPTARG";;
+		* ) printError;;
+	esac
+done
+
+if [ "$CMD" != "" -a "$hostname" != "" ]
+then
+	main
+else
+	printError
+fi
+
+exit 0
