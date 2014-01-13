@@ -98,25 +98,40 @@ main() {
 			then
 				parameters="$parameters --database-password $databasePassword"
 			fi
-			echo "$parameters"
-			bash -c "$execPath/vhosty-create-host $parameters"
+			bash -c "$execPath/vhosty-create $parameters"
 		fi
 		;;
 		"delete" )
-		bash -c "$execPath/vhosty-delete-host $parameters"
+		bash -c "$execPath/vhosty-delete $parameters"
 		;;
 		"update" )
 		;;
 	esac
 }
 
-while getopts "cduh:t:" Option; do
-	case $Option in
-		c ) CMD="create";;
-		d ) CMD="delete";;
-		u ) CMD="update";;
-		h ) hostname="$OPTARG";;
-		t ) hosttpl="$OPTARG";;
+TEMP=`getopt -o cduh:p:P:t: -l create,update,delete,host:,password:,database-password:,template: -n 'vhosty.sh' -- "$@"`
+
+if [ $? != 0 ] ; then printError ; fi
+
+eval set -- "$TEMP"
+while true ; do
+	case "$1" in
+		-c|--create ) CMD="create" ; shift ;;
+		-d|--delete ) CMD="delete" ; shift ;;
+		-u|--update ) CMD="update" ; shift ;;
+		-h|--host ) 
+			hostname="$2" ; shift 2 ;;
+		
+		-P|--password ) 
+			password="$2" ; shift 2 ;;
+		
+		-p|--database-password ) 
+			databasePassword="$2" ; shift 2 ;;
+		
+		-t|--template )
+			 hosttpl="$2" ; shift 2 ;;
+
+		-- ) shift ; break ;;
 		* ) printError;;
 	esac
 done
