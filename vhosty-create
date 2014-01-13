@@ -15,20 +15,28 @@
 # Authors:
 #  Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
 #
-# /usr/local/bin/vhosty-create-host
+# /usr/local/bin/vhosty-create
+
+databaseType=""
+databaseAccessUser=""
+databaseAccessPassword=""
+databaseHost=""
 
 usage() {
-	echo "USAGE: $0 -c -h <HOST_NAME> -P <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE> -u root -U superSecredPaswword"
-	echo "USAGE: $0 -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
-	echo "USAGE: $0 -d -h <HOST_NAME>"
+	sn=`basename $0`
+
+	echo "USAGE: $sn -c -h <HOST_NAME> -P <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE> -u <DATABASE_USER> -U <PASSWORD_FOR_DATABASE_USER>"
+	echo "USAGE: $sn -u --host <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
+	echo "USAGE: $sn -d -h <HOST_NAME>"
 	echo -e "Options:"
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
 	echo -e "\t-P | --password Set password on database and system user"
 	echo -e "\t-p | --database-password Set password on database and system user"
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
-	echo -e "\t-d | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"
+	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"
+	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server name or adress. Example: 127.0.0.1"
 	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser name who can create databse and grants priveleges. Example: root."
-	echo -e "\t-U | --database-access-password <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassowrd for user who can create databse and grants priveleges. Example: superSecredPaswword."
+	echo -e "\t-U | --database-access-password <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create database and grants priveleges. Example: superSecredPaswword."
 }
 
 printError() {
@@ -40,15 +48,43 @@ main() {
 	#todo
 }
 
-while getopts "h:t:" Option; do
-	case $Option in
-		h ) hostname="$OPTARG";;
-		t ) hosttpl="$OPTARG";;
+TEMP=`getopt -o h:p:P:t:D:H -l host:,password:,database-password:,template:,database-type:,database-host:,database-access-user:,database-access-password: -n 'vhosty.sh' -- "$@"`
+
+if [ $? != 0 ] ; then printError ; fi
+
+eval set -- "$TEMP"
+while true ; do
+	case "$1" in
+		-h|--host ) 
+			hostname="$2" ; shift 2 ;;
+		
+		-P|--password ) 
+			password="$2" ; shift 2 ;;
+		
+		-p|--database-password ) 
+			databasePassword="$2" ; shift 2 ;;
+		
+		-t|--template )
+			hosttpl="$2" ; shift 2 ;;
+
+		-D|--database-type )
+			databaseType="$2" ; shift 2 ;;
+		
+		-D|--database-host )
+			databaseHost="$2" ; shift 2 ;;			
+		
+		-u|--database-access-user )
+			databaseAccessUser="$2" ; shift 2 ;;
+
+		-U|--database-access-password )
+			databaseAccessPassword="$2" ; shift 2 ;;
+
+		-- ) shift ; break ;;
 		* ) printError;;
 	esac
 done
 
-if [ "$CMD" != "" -a "$hostname" != "" ]
+if [ "$hostname" != "" ]
 then
 	main
 else

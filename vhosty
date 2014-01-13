@@ -18,19 +18,12 @@
 # /usr/local/bin/vhosty
 VHOSTY_CONFIG_FILE_PATH="/etc/vhosty.ini" #
 
-# WEB_CONF_ROOT="/var/www"
-# WEB_SERVER_CONFIG_TEMPLATE_PATH=""
-# VIRTUAL_HOSTS_FOLDER_NAME="vhosts"
-
-# BACKUPROOT="/var/backups"
-# MYSQL_SERVER_ADRESS="127.0.0.1"
-# MYSQL_ROOT_PASS="secret_password"
-
 hostname=""
 CMD=""
 hosttpl=""
 password=""
 databasePassword=""
+databaseType=""
 execPath=""
 
 #thx2 ajdiaz. This function get from http://ajdiaz.wordpress.com/2008/02/09/bash-ini-parser/
@@ -57,16 +50,18 @@ cfg_parser ()
 }
 
 usage() {
-	echo "USAGE: $0 -c -h <HOST_NAME> --password <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE>"
-	echo "USAGE: $0 -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
-	echo "USAGE: $0 -d -h <HOST_NAME>"
+	sn=`basename $0`
+
+	echo "USAGE: $sn -c -h <HOST_NAME> --password <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE>"
+	echo "USAGE: $sn -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
+	echo "USAGE: $sn -d -h <HOST_NAME>"
 	echo -e "Options:"
 	echo -e "\t-c | --create Create virtual host."
 	echo -e "\t-u | --update Update existing virtual host."
 	echo -e "\t-d | --delete Delete existing virtual host."
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
 	echo -e "\t-P | --password <SECRET_PASSWORD>\tSet password on database and system user"
-	echo -e "\t-d | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"	
+	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"	
 	echo -e "\t-p | --database-password <SECRET_PASSWORD>\tThis password will be set on new database user"
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
 }
@@ -78,13 +73,13 @@ printError() {
 loadConfig() {
 	cfg_parser "$VHOSTY_CONFIG_FILE_PATH"
 	cfg.section.main
-	cfg.section.database
+	cfg.section."$databaseType"
 }
 
 main() {
 	execPath=`pwd`
 	loadConfig
-	parameters="--host $hostname"
+	parameters="--host $hostname --database-type $databaseType"
 	case $CMD in
 		"create" )
 		if [ "$hosttpl" != "" ]
@@ -99,6 +94,10 @@ main() {
 			then
 				parameters="$parameters --database-password $databasePassword"
 			fi
+			parameters="$parameters --database-access-user $DB_USER \
+			--database-access-password $DB_PASS \
+			--database-host $DB_SERVER_ADRESS"
+
 			bash -c "$execPath/vhosty-create $parameters"
 		fi
 		;;
@@ -110,7 +109,7 @@ main() {
 	esac
 }
 
-TEMP=`getopt -o cduh:p:P:t: -l create,update,delete,host:,password:,database-password:,template: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o cduh:p:D:P:t: -l create,update,delete,host:,password:,database-type:,database-password:,template: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
@@ -131,6 +130,9 @@ while true ; do
 		
 		-t|--template )
 			 hosttpl="$2" ; shift 2 ;;
+
+		-D|--database-type )
+			databaseType="$2" ; shift 2 ;;
 
 		-- ) shift ; break ;;
 		* ) printError;;
