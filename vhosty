@@ -65,8 +65,9 @@ usage() {
 	echo -e "\t-u | --update Update existing virtual host."
 	echo -e "\t-d | --delete Delete existing virtual host."
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
-	echo -e "\t-P | --password Set password on database and system user"
-	echo -e "\t-p | --database-password Set password on database and system user"
+	echo -e "\t-P | --password <SECRET_PASSWORD>\tSet password on database and system user"
+	echo -e "\t-d | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"	
+	echo -e "\t-p | --database-password <SECRET_PASSWORD>\tThis password will be set on new database user"
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
 }
 
@@ -98,12 +99,11 @@ main() {
 			then
 				parameters="$parameters --database-password $databasePassword"
 			fi
-			echo "$parameters"
-			bash -c "$execPath/vhosty-create-host $parameters"
+			bash -c "$execPath/vhosty-create $parameters"
 		fi
 		;;
 		"delete" )
-		bash -c "$execPath/vhosty-delete-host $parameters"
+		bash -c "$execPath/vhosty-delete $parameters"
 		;;
 		"update" )
 		;;

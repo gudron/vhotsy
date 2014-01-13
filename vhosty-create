@@ -18,7 +18,7 @@
 # /usr/local/bin/vhosty-create-host
 
 usage() {
-	echo "USAGE: $0 -c -h <HOST_NAME> --password <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE>"
+	echo "USAGE: $0 -c -h <HOST_NAME> -P <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE> -u root -U superSecredPaswword"
 	echo "USAGE: $0 -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
 	echo "USAGE: $0 -d -h <HOST_NAME>"
 	echo -e "Options:"
@@ -26,6 +26,9 @@ usage() {
 	echo -e "\t-P | --password Set password on database and system user"
 	echo -e "\t-p | --database-password Set password on database and system user"
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
+	echo -e "\t-d | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"
+	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser name who can create databse and grants priveleges. Example: root."
+	echo -e "\t-U | --database-access-password <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassowrd for user who can create databse and grants priveleges. Example: superSecredPaswword."
 }
 
 printError() {
