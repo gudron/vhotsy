@@ -10,7 +10,15 @@ Simple helper for organize web-dev environment
 
 Unix-like opeation system
 
+#### Bindfs
+
+On my home PC i using that utility for development. 
+
+They emulate rights on READ,WRITE,EXEC for MY OS user, 
+but real owner of files and directories is another user.
+
 #### Jailcoopy
+
 I using self writing script for copy bin files into jail-root.
 
 - **Name**: jailcoopy

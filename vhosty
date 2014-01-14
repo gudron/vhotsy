@@ -85,15 +85,8 @@ main() {
 		if [ "$hosttpl" != "" ]
 		then
 			parameters="$parameters --template $hosttpl"
-			if [ "$password" != "" ]
-			then
-				parameters="$parameters --password $password"
-			fi
-
-			if [ "$databasePassword" != "" ]
-			then
-				parameters="$parameters --database-password $databasePassword"
-			fi
+			if [ "$password" != "" ] then parameters="$parameters --password $password" fi
+			if [ "$databasePassword" != "" ] then parameters="$parameters --database-password $databasePassword" fi
 			parameters="$parameters --database-access-user $DB_USER \
 			--database-access-password $DB_PASS \
 			--database-host $DB_SERVER_ADRESS"
