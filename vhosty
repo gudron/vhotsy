@@ -84,12 +84,18 @@ main() {
 		"create" )
 		if [ "$hosttpl" != "" ]
 		then
-			parameters="$parameters --template $hosttpl"
-			if [ "$password" != "" ] then parameters="$parameters --password $password" fi
-			if [ "$databasePassword" != "" ] then parameters="$parameters --database-password $databasePassword" fi
-			parameters="$parameters --database-access-user $DB_USER \
+			if [ "$password" != "" ] 
+				then 
+				parameters="$parameters --password $password"
+			fi
+			if [ "$databasePassword" != "" ] 
+				then parameters="$parameters --database-password $databasePassword" 
+			fi
+			parameters="$parameters --template $hosttpl \
+			--database-access-user $DB_USER \
 			--database-access-password $DB_PASS \
-			--database-host $DB_SERVER_ADRESS"
+			--database-host $DB_SERVER_ADRESS \
+			--jail-roots-path $WEB_CONF_ROOT"
 
 			bash -c "$execPath/vhosty-create $parameters"
 		fi

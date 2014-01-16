@@ -84,7 +84,7 @@ createJailEnviroment() {
 	}
 
 	copyBinFile() {
-
+		echo binFile
 	}
 
 	copyOthersFiles() {
@@ -97,30 +97,30 @@ createJailEnviroment() {
 	ln -s "$rootPath" "$virtualHostsPath"/"$hostname"
 	
 	createHome
-	mkdir -p "$rootPath"/bin "$rootPath"/lib "$rootPath"/usr/bin 
-	mkdir -p "$rootPath"/usr/lib "$rootPath"/usr/share/zoneinfo 
-	mkdir -p "$rootPath"/usr/share/misc 
-	copyOthersFiles
-	createEtc
+	#mkdir -p "$rootPath"/bin "$rootPath"/lib "$rootPath"/usr/bin 
+	#mkdir -p "$rootPath"/usr/lib "$rootPath"/usr/share/zoneinfo 
+	#mkdir -p "$rootPath"/usr/share/misc 
+	#copyOthersFiles
+	#createEtc
 }
 
 createUser() {
 	userName=`echo -n $hostname | openssl md5 | awk '{print $2}'`
-	useradd "$userName" \ 
-		-d "$virtualHostsPath"/containers/"$userName"/home \ 
-		-G "$VhGroupName" \ 
+	useradd "$userName \ 
+		-d $virtualHostsPath/containers/$userName/home \ 
+		-G $VhGroupName \ 
 		-s /bin/false \ 
-		-p`mkpasswd -m sha-512 "$pass"`
+		-p`mkpasswd -m sha-512 $pass`"
 
 	usermod -a -G "$hostname" www-data backup gudron
 }
 
 main() {
-
-
+	createUser
+	createJailEnviroment
 }
 
-TEMP=`getopt -o h:p:P:t:r:D:H: -l host:,password:,database-password:,template:,root-path,database-type:,database-host:,database-access-user:,database-access-password: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o h:p:P:t:j:D:H: -l host:,password:,database-password:,template:,jail-roots-path:,database-type:,database-host:,database-access-user:,database-access-password: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
@@ -140,7 +140,7 @@ while true ; do
 			hosttpl="$2" ; shift 2 ;;
 
 		-j|--jail-roots-path )
-			virtualHostsRoot="$2" ; shift 2 ;;
+			virtualHostsPath="$2" ; shift 2 ;;
 
 		-D|--database-type )
 			databaseType="$2" ; shift 2 ;;
