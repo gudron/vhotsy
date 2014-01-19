@@ -37,21 +37,43 @@ rootPath=""
 usage() {
 	sn=`basename $0`
 
-	echo "USAGE: $sn -c -h <HOST_NAME> -P <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE> -u <DATABASE_USER> -U <PASSWORD_FOR_DATABASE_USER>"
-	echo "USAGE: $sn -u --host <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
-	echo "USAGE: $sn -d -h <HOST_NAME>"
+	echo "USAGE: $sn -h <HOST_NAME> -P <PASSWORD>\
+	 	-t <WEB_SERVER_CONFIG_TEMPLATE> -u <DATABASE_USER>\
+	 	-U <PASSWORD_FOR_DATABASE_USER>"
+
+	echo "USAGE: $sn --host <HOST_NAME> --database-password\
+		<DATABASE_PASSWORD>"	
+
+	echo "USAGE: $sn -h <HOST_NAME>"
 	echo -e "Options:"
-	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
+	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample:\
+		example.dev,example.loc"
+
 	echo -e "\t-P | --password Set password on database and system user"
 	echo -e "\t-p | --database-password Set password on database and system user"
-	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
-	echo -e "\t-j | --jail-roots-path <PATH_TO_VHOSTS_PARENT_DIR>\tPath to parent directory of all virtual hosts. Example: /var/www/"
-	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"
-	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server name or adress. Example: 127.0.0.1"
-	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser name who can create databse and grants priveleges. Example: root."
-	echo -e "\t-U | --database-access-password <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create database and grants priveleges. Example: superSecredPaswword."
+	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config\
+		template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in\
+		https://github.com/gudron/nginxconfy"
+
+	echo -e "\t-j | --jail-roots-path <PATH_TO_VHOSTS_PARENT_DIR>\tPath to\
+		parent directory of all virtual hosts. Example: /var/www/"
+
+	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
+		Available: mysql"
+
+	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server\
+		name or adress. Example: 127.0.0.1"
+
+	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser\
+		name who can create databse and grants priveleges. Example: root."
+
+	echo -e "\t-U | --database-access-password\
+		<USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
+		database and grants priveleges. Example: superSecredPaswword."
+
 	echo -e "\t--host-pre-user\t Using one host one user structure."
-	echo -e "\t--owner\t If not host per user, then using owner of files and folders."
+	echo -e "\t--owner\t If not host per user, then using owner of files and\
+		folders."
 }
 
 printError() {
@@ -76,20 +98,23 @@ createJailEnviroment() {
 		mkdir "$etcPath"/ssh
 		#add passwd file
 		touch "$etcPath"/etc/passwd
-		cat /etc/passwd | grep root > "$etcPath"/passwd
-		cat /etc/passwd | grep $userName >> "$etcPath"/etc/passwd
+		cat /etc/passwd | grep root 		 > "$etcPath"/passwd
+		cat /etc/passwd | grep $userName 	>> "$etcPath"/etc/passwd
 		#add group file
 		touch "$etcPath"/group
-		grep -e ^root /etc/group > "$etcPath"/group
-		grep -e ^www-data /etc/group >> "$etcPath"/group
-		grep -e ^$VhGroupName /etc/group >> "$etcPath"/group
-		grep -e ^$userName /etc/group >> "$etcPath"/group
+		grep -e ^root /etc/group 			 > "$etcPath"/group
+		grep -e ^www-data /etc/group 		>> "$etcPath"/group
+		grep -e ^$VhGroupName /etc/group 	>> "$etcPath"/group
+		grep -e ^$userName /etc/group 		>> "$etcPath"/group
 		#add shadowp file
 		touch  "$etcPath"/shadow
-		cat /etc/shadow | grep $userName > "$etcPath"/shadow
+		cat /etc/shadow | grep $userName 	 > "$etcPath"/shadow
 
-		cp /etc/host.conf /etc/localtime /etc/nsswitch.conf "$etcPath"
-		cp /etc/resolv.conf /etc/shells "$etcPath"
+		cp "/etc/host.conf \
+			/etc/localtime \
+			/etc/nsswitch.conf \
+			/etc/resolv.conf \
+			/etc/shells $etcPath"
 	}
 
 	copyBinFile() {
@@ -100,18 +125,23 @@ createJailEnviroment() {
 		cp -R /usr/share/zoneinfo/* "$VHROOT"/"$hostname"/usr/share/zoneinfo
 	}
 
+	createHostConfig() {
+		#creating host config
+		touch "$rootPath"/hostconfig.ini
+		echo "[main]" 						 > "$rootPath"/hostconfig.ini
+		echo "SITE_NAME='$hostname'" 		>> "$rootPath"/hostconfig.ini
+		echo "DB_TYPE='$databaseType'" 		>> "$rootPath"/hostconfig.ini
+		echo "DB_NAME='$dataBaseName'" 		>> "$rootPath"/hostconfig.ini
+		echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/hostconfig.ini
+		echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/hostconfig.ini
+	}
+
 	rootPath="$virtualHostsPath"/containers/"$userName"
 	mkdir -p "$rootPath"
 	chown root:root "$rootPath"
 	ln -s "$rootPath" "$virtualHostsPath"/"$hostname"
-	#creating host config
-	touch "$rootPath"/hostconfig.ini
-	echo "[main]" 						 > "$rootPath"/hostconfig.ini
-	echo "SITE_NAME='$hostname'" 		>> "$rootPath"/hostconfig.ini
-	echo "DB_TYPE='$databaseType'" 		>> "$rootPath"/hostconfig.ini
-	echo "DB_NAME='$dataBaseName'" 		>> "$rootPath"/hostconfig.ini
-	echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/hostconfig.ini
 
+	createHostConfig
 	createHome
 	#mkdir -p "$rootPath"/bin "$rootPath"/lib "$rootPath"/usr/bin 
 	#mkdir -p "$rootPath"/usr/lib "$rootPath"/usr/share/zoneinfo 
@@ -142,6 +172,7 @@ main() {
 		createUser
 		else 
 		userName=owner
+		unset owner
 	fi
 
 	createJailEnviroment

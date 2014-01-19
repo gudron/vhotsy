@@ -36,19 +36,69 @@ rootPath=""
 usage() {
 	sn=`basename $0`
 
-	echo "USAGE: $sn -c -h <HOST_NAME> -P <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE> -u <DATABASE_USER> -U <PASSWORD_FOR_DATABASE_USER>"
-	echo "USAGE: $sn -u --host <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
-	echo "USAGE: $sn -d -h <HOST_NAME>"
+	echo "USAGE: $sn -h <HOST_NAME> -D <DATABASE_TYPE> -u <DATABASE_USER>\
+		-U <PASSWORD_FOR_DATABASE_USER>"
+
+	echo "USAGE: $sn --host <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
+	echo "USAGE: $sn -h <HOST_NAME>"
 	echo -e "Options:"
-	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample: example.dev,example.loc"
-	echo -e "\t-P | --password Set password on database and system user"
-	echo -e "\t-p | --database-password Set password on database and system user"
-	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
-	echo -e "\t-j | --jail-roots-path <PATH_TO_VHOSTS_PARENT_DIR>\tPath to parent directory of all virtual hosts. Example: /var/www/"
-	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"
-	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server name or adress. Example: 127.0.0.1"
-	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser name who can create databse and grants priveleges. Example: root."
-	echo -e "\t-U | --database-access-password <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create database and grants priveleges. Example: superSecredPaswword."
-	echo -e "\t--host-pre-user\t Using one host one user structure."
-	echo -e "\t--owner\t If not host per user, then using owner of files and folders."
+	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample:\
+		example.dev,example.loc"
+
+	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
+		Available: mysql"
+
+	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server\
+		name or adress. Example: 127.0.0.1"
+
+	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser\
+		name who can create databse and grants priveleges. Example: root."
+	echo -e "\t-U | --database-access-password\
+		<USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
+		database and grants priveleges. Example: superSecredPaswword."
 }
+
+printError() {
+	echo "[!] Invalid option" && usage && exit 1
+}
+
+main () {
+
+}
+
+TEMP=`getopt -o h:D:H:j: -l host:,database-type:,database-host:,database-access-user:,database-access-password:,jail-roots-path: -n 'vhosty.sh' -- "$@"`
+
+if [ $? != 0 ] ; then printError ; fi
+
+eval set -- "$TEMP"
+while true ; do
+	case "$1" in
+		-h|--host ) 
+			hostname="$2" ; shift 2 ;;
+		
+		-D|--database-type )
+			databaseType="$2" ; shift 2 ;;
+		
+		-H|--database-host )
+			databaseHost="$2" ; shift 2 ;;			
+		
+		-u|--database-access-user )
+			databaseAccessUser="$2" ; shift 2 ;;
+
+		-U|--database-access-password )
+			databaseAccessPassword="$2" ; shift 2 ;;
+
+		-j|--jail-roots-path )
+			virtualHostsPath="$2" ; shift 2 ;;
+
+		-- ) shift ; break ;;
+		* ) printError;;
+	esac
+done
+
+if [ "$hostname" != "" ]
+then
+	main
+else
+	printError
+fi
