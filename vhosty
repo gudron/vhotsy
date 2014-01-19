@@ -15,6 +15,9 @@
 # Authors:
 #  Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
 #
+# Repository:
+#  https://github.com/gudron/vhotsy
+#
 # /usr/local/bin/vhosty
 VHOSTY_CONFIG_FILE_PATH="/etc/vhosty.ini" #
 
@@ -25,6 +28,7 @@ password=""
 databasePassword=""
 databaseType=""
 execPath=""
+hostPerUser=false
 
 #thx2 ajdiaz. This function get from http://ajdiaz.wordpress.com/2008/02/09/bash-ini-parser/
 cfg_parser ()
@@ -64,6 +68,7 @@ usage() {
 	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use. Available: mysql"	
 	echo -e "\t-p | --database-password <SECRET_PASSWORD>\tThis password will be set on new database user"
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in https://github.com/gudron/nginxconfy"
+	echo -e "\t-H | --host-pre-user\t Using one host one user structure."
 }
 
 printError() {
@@ -73,6 +78,7 @@ printError() {
 loadConfig() {
 	cfg_parser "$VHOSTY_CONFIG_FILE_PATH"
 	cfg.section.main
+	cfg.section.custom
 	cfg.section."$databaseType"
 }
 
@@ -84,14 +90,21 @@ main() {
 		"create" )
 		if [ "$hosttpl" != "" ]
 		then
-			if [ "$password" != "" ] 
+			if [ "$password" == "" ] 
 				then 
-				parameters="$parameters --password $password"
+				password=`</dev/urandom tr -dc '0123456789a-zA-Z' | head -c12`
 			fi
 			if [ "$databasePassword" != "" ] 
 				then parameters="$parameters --database-password $databasePassword" 
 			fi
-			parameters="$parameters --template $hosttpl \
+			if hostPerUser;
+				then 
+				parameters="$parameters --host-pre-user"
+				else 
+				parameters="$parameters --owner $MAIN_USER"
+			fi
+			parameters="$parameters --password $password\
+			--template $hosttpl \
 			--database-access-user $DB_USER \
 			--database-access-password $DB_PASS \
 			--database-host $DB_SERVER_ADRESS \
@@ -133,6 +146,8 @@ while true ; do
 		-D|--database-type )
 			databaseType="$2" ; shift 2 ;;
 
+		-H|--host-pre-user ) hostPerUser=true ; shift;;
+			
 		-- ) shift ; break ;;
 		* ) printError;;
 	esac

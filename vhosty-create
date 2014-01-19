@@ -15,6 +15,9 @@
 # Authors:
 #  Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
 #
+# Repository:
+#  https://github.com/gudron/vhotsy
+#
 # /usr/local/bin/vhosty-create
 
 virtualHostsPath=""
@@ -22,8 +25,12 @@ databaseType=""
 databaseAccessUser=""
 databaseAccessPassword=""
 databaseHost=""
+dataBaseName=""
+hostPerUser=false
+owner=""
 
 userName=""
+containerName=""
 homePath=""
 rootPath=""
 
@@ -43,6 +50,8 @@ usage() {
 	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server name or adress. Example: 127.0.0.1"
 	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser name who can create databse and grants priveleges. Example: root."
 	echo -e "\t-U | --database-access-password <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create database and grants priveleges. Example: superSecredPaswword."
+	echo -e "\t--host-pre-user\t Using one host one user structure."
+	echo -e "\t--owner\t If not host per user, then using owner of files and folders."
 }
 
 printError() {
@@ -53,8 +62,8 @@ createJailEnviroment() {
 	createHome() {
 		homePath="$rootPath"/home
 		mkdir "$homePath"
-		mkdir "$homePath"/htdocks "$homePath"/.ssh
-		touch "$VHROOT"/"$hostname"/home/.ssh/authorized_keys
+		mkdir "$homePath"/htdocks "$homePath"/docks "$homePath"/.ssh
+		touch "$homePath"/.ssh/authorized_keys
 
 		chmod -R 1770 "$homePath"
 		chown -R "$userName":"$userName" "$homePath"
@@ -95,7 +104,14 @@ createJailEnviroment() {
 	mkdir -p "$rootPath"
 	chown root:root "$rootPath"
 	ln -s "$rootPath" "$virtualHostsPath"/"$hostname"
-	
+	#creating host config
+	touch "$rootPath"/hostconfig.ini
+	echo "[main]" 						 > "$rootPath"/hostconfig.ini
+	echo "SITE_NAME='$hostname'" 		>> "$rootPath"/hostconfig.ini
+	echo "DB_TYPE='$databaseType'" 		>> "$rootPath"/hostconfig.ini
+	echo "DB_NAME='$dataBaseName'" 		>> "$rootPath"/hostconfig.ini
+	echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/hostconfig.ini
+
 	createHome
 	#mkdir -p "$rootPath"/bin "$rootPath"/lib "$rootPath"/usr/bin 
 	#mkdir -p "$rootPath"/usr/lib "$rootPath"/usr/share/zoneinfo 
@@ -105,18 +121,29 @@ createJailEnviroment() {
 }
 
 createUser() {
-	userName=`echo -n $hostname | openssl md5 | awk '{print $2}'`
 	useradd "$userName \ 
 		-d $virtualHostsPath/containers/$userName/home \ 
 		-G $VhGroupName \ 
 		-s /bin/false \ 
 		-p`mkpasswd -m sha-512 $pass`"
-
 	usermod -a -G "$hostname" www-data backup gudron
 }
 
 main() {
-	createUser
+	# get sha1 hash from hostname;
+	# example.com -> 0caaf24ab1a0c33440c06afe99df986365b0781f
+	containerName=`echo -n $hostname | openssl sha1 | awk '{print $2}'`
+	# get short sha1 hash from hostname, first 7 character;
+	# 0caaf24ab1a0c33440c06afe99df986365b0781f -> 0caaf24
+	dataBaseName=${containerName::7}
+	if hostPerUser;
+		then 
+		userName=dataBaseName
+		createUser
+		else 
+		userName=owner
+	fi
+
 	createJailEnviroment
 }
 
@@ -153,6 +180,11 @@ while true ; do
 
 		-U|--database-access-password )
 			databaseAccessPassword="$2" ; shift 2 ;;
+
+		--host-pre-user ) hostPerUser=true; shift ;;
+
+		--owner )
+			owner="$2"; shift 2 ;;
 
 		-- ) shift ; break ;;
 		* ) printError;;
