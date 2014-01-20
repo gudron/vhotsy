@@ -33,7 +33,9 @@ hostPerUser=false
 usage() {
 	sn=`basename $0`
 
-	echo "USAGE: $sn -c -h <HOST_NAME> --password <PASSWORD> -t <WEB_SERVER_CONFIG_TEMPLATE>"
+	echo "USAGE: $sn -c -h <HOST_NAME> --password <PASSWORD>\
+		-t <WEB_SERVER_CONFIG_TEMPLATE>"
+
 	echo "USAGE: $sn -u -h <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
 	echo "USAGE: $sn -d -h <HOST_NAME>"
 	echo -e "Options:"
@@ -41,16 +43,21 @@ usage() {
 	echo -e "\t-u | --update Update existing virtual host."
 	echo -e "\t-d | --delete Delete existing virtual host."
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\t\
-		Example: example.dev,example.loc"
+ Example: example.dev,example.loc"
+
 	echo -e "\t-P | --password <SECRET_PASSWORD>\tSet password on database and\
-		system user"
+ system user"
+
 	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
-		Available: mysql"	
+ Available: mysql"
+
 	echo -e "\t-p | --database-password <SECRET_PASSWORD>\tThis password will\
-		be set on new database user"
+ be set on new database user"
+
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config\
-		template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in\
-		https://github.com/gudron/nginxconfy"
+ template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in\
+ https://github.com/gudron/nginxconfy"
+
 	echo -e "\t-H | --host-pre-user\t Using one host one user structure."
 }
 
@@ -82,18 +89,18 @@ main() {
 				then 
 				parameters="$parameters --database-password $databasePassword" 
 			fi
-			if hostPerUser;
+			if hostPerUser ;
 				then 
 				parameters="$parameters --host-pre-user"
 				else 
 				parameters="$parameters --owner $MAIN_USER"
 			fi
-			parameters="$parameters --password $password\
-			--template $hosttpl \
-			--database-access-user $DB_USER \
-			--database-access-password $DB_PASS \
-			--database-host $DB_SERVER_ADRESS \
-			--jail-roots-path $WEB_CONF_ROOT"
+			parameters="$parameters --password $password \
+--template $hosttpl \
+--database-access-user $DB_USER \
+--database-access-password $DB_PASS \
+--database-host $DB_SERVER_ADRESS \
+--jail-roots-path $WEB_CONF_ROOT"
 
 			bash -c "$execPath/vhosty-create $parameters"
 		fi

@@ -43,19 +43,21 @@ usage() {
 	echo "USAGE: $sn -h <HOST_NAME>"
 	echo -e "Options:"
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample:\
-		example.dev,example.loc"
+ example.dev,example.loc"
 
 	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
-		Available: mysql"
+ Available: mysql"
 
 	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server\
-		name or adress. Example: 127.0.0.1"
+ name or adress. Example: 127.0.0.1"
 
 	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser\
-		name who can create databse and grants priveleges. Example: root."
+ name who can create databse and grants priveleges. Example: root."
+
 	echo -e "\t-U | --database-access-password\
-		<USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
-		database and grants priveleges. Example: superSecredPaswword."
+ <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
+ database and grants priveleges. Example: superSecredPaswword."
+ 
 }
 
 printError() {

@@ -38,42 +38,42 @@ usage() {
 	sn=`basename $0`
 
 	echo "USAGE: $sn -h <HOST_NAME> -P <PASSWORD>\
-	 	-t <WEB_SERVER_CONFIG_TEMPLATE> -u <DATABASE_USER>\
-	 	-U <PASSWORD_FOR_DATABASE_USER>"
+ -t <WEB_SERVER_CONFIG_TEMPLATE> -u <DATABASE_USER>\
+ -U <PASSWORD_FOR_DATABASE_USER>"
 
-	echo "USAGE: $sn --host <HOST_NAME> --database-password\
-		<DATABASE_PASSWORD>"	
+	echo "USAGE: $sn --host <HOST_NAME> --database-password
+ <DATABASE_PASSWORD>"	
 
 	echo "USAGE: $sn -h <HOST_NAME>"
 	echo -e "Options:"
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample:\
-		example.dev,example.loc"
+ example.dev,example.loc"
 
 	echo -e "\t-P | --password Set password on database and system user"
 	echo -e "\t-p | --database-password Set password on database and system user"
 	echo -e "\t-t | --template <WEB_SERVER_CONFIG_TEMPLATE>\tName of config\
-		template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in\
-		https://github.com/gudron/nginxconfy"
+ template for webserver.\n\tExample: wolfcms,yii,cohana. Full list in\
+ https://github.com/gudron/nginxconfy"
 
 	echo -e "\t-j | --jail-roots-path <PATH_TO_VHOSTS_PARENT_DIR>\tPath to\
-		parent directory of all virtual hosts. Example: /var/www/"
+ parent directory of all virtual hosts. Example: /var/www/"
 
 	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
-		Available: mysql"
+ Available: mysql"
 
 	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server\
-		name or adress. Example: 127.0.0.1"
+ name or adress. Example: 127.0.0.1"
 
 	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser\
-		name who can create databse and grants priveleges. Example: root."
+ name who can create databse and grants priveleges. Example: root."
 
 	echo -e "\t-U | --database-access-password\
-		<USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
-		database and grants priveleges. Example: superSecredPaswword."
+ <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
+ database and grants priveleges. Example: superSecredPaswword."
 
 	echo -e "\t--host-pre-user\t Using one host one user structure."
 	echo -e "\t--owner\t If not host per user, then using owner of files and\
-		folders."
+ folders."
 }
 
 printError() {
@@ -106,7 +106,7 @@ createJailEnviroment() {
 		grep -e ^www-data /etc/group 		>> "$etcPath"/group
 		grep -e ^$VhGroupName /etc/group 	>> "$etcPath"/group
 		grep -e ^$userName /etc/group 		>> "$etcPath"/group
-		#add shadowp file
+		#add shadow file
 		touch  "$etcPath"/shadow
 		cat /etc/shadow | grep $userName 	 > "$etcPath"/shadow
 
@@ -127,27 +127,26 @@ createJailEnviroment() {
 
 	createHostConfig() {
 		#creating host config
-		touch "$rootPath"/hostconfig.ini
-		echo "[main]" 						 > "$rootPath"/hostconfig.ini
-		echo "SITE_NAME='$hostname'" 		>> "$rootPath"/hostconfig.ini
-		echo "DB_TYPE='$databaseType'" 		>> "$rootPath"/hostconfig.ini
-		echo "DB_NAME='$dataBaseName'" 		>> "$rootPath"/hostconfig.ini
-		echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/hostconfig.ini
-		echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/hostconfig.ini
+		configFileName="hostconfig.ini"
+		touch "$rootPath"/"$configFileName"
+		echo "[main]" 						 > "$rootPath"/"$configFileName"
+		echo "SITE_NAME='$hostname'" 		>> "$rootPath"/"$configFileName"
+		echo "DB_TYPE='$databaseType'" 		>> "$rootPath"/"$configFileName"
+		echo "DB_NAME='$dataBaseName'" 		>> "$rootPath"/"$configFileName"
+		echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/"$configFileName"
 	}
 
-	rootPath="$virtualHostsPath"/containers/"$userName"
+	rootPath="$virtualHostsPath"/containers/"$containerName"
 	mkdir -p "$rootPath"
 	chown root:root "$rootPath"
 	ln -s "$rootPath" "$virtualHostsPath"/"$hostname"
+	#add container name and host name to file. One line - one host - one name
+	hostListFile="hostlist"
+	touch "$virtualHostsPath"/"$hostListFile"
+	echo "$hostname $containerName" >> "$virtualHostsPath"/"$hostListFile"
 
 	createHostConfig
 	createHome
-	#mkdir -p "$rootPath"/bin "$rootPath"/lib "$rootPath"/usr/bin 
-	#mkdir -p "$rootPath"/usr/lib "$rootPath"/usr/share/zoneinfo 
-	#mkdir -p "$rootPath"/usr/share/misc 
-	#copyOthersFiles
-	#createEtc
 }
 
 createUser() {
@@ -171,14 +170,14 @@ main() {
 		userName=dataBaseName
 		createUser
 		else 
-		userName=owner
+		userName="$owner"
 		unset owner
 	fi
 
 	createJailEnviroment
 }
 
-TEMP=`getopt -o h:p:P:t:j:D:H: -l host:,password:,database-password:,template:,jail-roots-path:,database-type:,database-host:,database-access-user:,database-access-password: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o h:p:P:t:j:D:H: -l host:,password:,database-password:,template:,jail-roots-path:,database-type:,database-host:,database-access-user:,database-access-password:,owner: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
