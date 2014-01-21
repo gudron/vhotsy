@@ -111,10 +111,10 @@ createJailEnviroment() {
 		cat /etc/shadow | grep $userName 	 > "$etcPath"/shadow
 
 		cp "/etc/host.conf \
-			/etc/localtime \
-			/etc/nsswitch.conf \
-			/etc/resolv.conf \
-			/etc/shells $etcPath"
+ /etc/localtime \
+ /etc/nsswitch.conf \
+ /etc/resolv.conf \
+ /etc/shells $etcPath"
 	}
 
 	copyBinFile() {
@@ -139,7 +139,10 @@ createJailEnviroment() {
 	rootPath="$virtualHostsPath"/containers/"$containerName"
 	mkdir -p "$rootPath"
 	chown root:root "$rootPath"
-	ln -s "$rootPath" "$virtualHostsPath"/"$hostname"
+	#create relative symlink and return to executin dir
+	cd $virtualHostsPath
+	ln -s ./containers/$containerName $hostname
+	cd `dirname $0`
 	#add container name and host name to file. One line - one host - one name
 	hostListFile="hostlist"
 	touch "$virtualHostsPath"/"$hostListFile"
@@ -151,10 +154,10 @@ createJailEnviroment() {
 
 createUser() {
 	useradd "$userName \ 
-		-d $virtualHostsPath/containers/$userName/home \ 
-		-G $VhGroupName \ 
-		-s /bin/false \ 
-		-p`mkpasswd -m sha-512 $pass`"
+ -d $virtualHostsPath/containers/$userName/home \ 
+ -G $VhGroupName \ 
+ -s /bin/false \ 
+ -p`mkpasswd -m sha-512 $pass`"
 	usermod -a -G "$hostname" www-data backup gudron
 }
 
