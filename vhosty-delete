@@ -68,7 +68,7 @@ main () {
 
 }
 
-TEMP=`getopt -o h:D:H:j: -l host:,database-type:,database-host:,database-access-user:,database-access-password:,jail-roots-path: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o h:D:H:j: -l host:,database-host:,jail-roots-path: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
@@ -78,17 +78,8 @@ while true ; do
 		-h|--host ) 
 			hostname="$2" ; shift 2 ;;
 		
-		-D|--database-type )
-			databaseType="$2" ; shift 2 ;;
-		
 		-H|--database-host )
 			databaseHost="$2" ; shift 2 ;;			
-		
-		-u|--database-access-user )
-			databaseAccessUser="$2" ; shift 2 ;;
-
-		-U|--database-access-password )
-			databaseAccessPassword="$2" ; shift 2 ;;
 
 		-j|--jail-roots-path )
 			virtualHostsPath="$2" ; shift 2 ;;

@@ -26,6 +26,7 @@ databaseAccessUser=""
 databaseAccessPassword=""
 databaseHost=""
 dataBaseName=""
+databasePassword=""
 hostPerUser=false
 owner=""
 
@@ -128,12 +129,14 @@ createJailEnviroment() {
 	createHostConfig() {
 		#creating host config
 		configFileName="hostconfig.ini"
+		configFilePath="$rootPath"/"$configFileName"
 		touch "$rootPath"/"$configFileName"
-		echo "[main]" 						 > "$rootPath"/"$configFileName"
-		echo "SITE_NAME='$hostname'" 		>> "$rootPath"/"$configFileName"
-		echo "DB_TYPE='$databaseType'" 		>> "$rootPath"/"$configFileName"
-		echo "DB_NAME='$dataBaseName'" 		>> "$rootPath"/"$configFileName"
-		echo "DB_PASS='$databasePassword'" 	>> "$rootPath"/"$configFileName"
+		echo "[main]" 						 > "$configFilePath"
+		echo "SITE_NAME='$hostname'" 		>> "$configFilePath"
+		echo "DB_TYPE='$databaseType'" 		>> "$configFilePath"
+		echo "DB_NAME='$dataBaseName'" 		>> "$configFilePath"
+		echo "DB_PASS='$databasePassword'" 	>> "$configFilePath"
+		echo "HOST_PER_USER='$hostPerUser'" >> "$configFilePath"
 	}
 
 	rootPath="$virtualHostsPath"/containers/"$containerName"
@@ -177,6 +180,11 @@ main() {
 		unset owner
 	fi
 
+	if [ "$databasePassword" == "" ] 
+		then	
+		databasePassword=`</dev/urandom tr -dc '0123456789a-zA-Z' | head -c12`
+	fi
+	
 	createJailEnviroment
 }
 
