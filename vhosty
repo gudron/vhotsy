@@ -1,22 +1,22 @@
 #!/bin/bash
 # ----------------------------------------------------------------------
-#    Copyright (c) 2014
+#	Copyright (c) 2014
 #
-#    This program is free software; you can redistribute it and/or
-#    modify it under the terms of version 3 of the GNU General Public
-#    License published by the Free Software Foundation.
+#	This program is free software; you can redistribute it and/or
+#	modify it under the terms of version 3 of the GNU General Public
+#	License published by the Free Software Foundation.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#	This program is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
 #
 # ----------------------------------------------------------------------
 # Authors:
-#  Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
+#	Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
 #
 # Repository:
-#  https://github.com/gudron/vhotsy
+#	https://github.com/gudron/vhotsy
 #
 # /usr/local/bin/vhosty
 VHOSTY_CONFIG_FILE_PATH="/etc/vhosty.ini" #
@@ -29,29 +29,6 @@ databasePassword=""
 databaseType=""
 execPath=""
 hostPerUser=false
-
-#thx2 ajdiaz. This function get from http://ajdiaz.wordpress.com/2008/02/09/bash-ini-parser/
-cfg_parser ()
-{
-    ini="$(<$1)"                # read the file
-    ini="${ini//[/\[}"          # escape [
-    ini="${ini//]/\]}"          # escape ]
-    IFS=$'\n' && ini=( ${ini} ) # convert to line-array
-    ini=( ${ini[*]//;*/} )      # remove comments with ;
-    ini=( ${ini[*]/\    =/=} )  # remove tabs before =
-    ini=( ${ini[*]/=\   /=} )   # remove tabs be =
-    ini=( ${ini[*]/\ =\ /=} )   # remove anything with a space around =
-    ini=( ${ini[*]/#\\[/\}$'\n'cfg.section.} ) # set section prefix
-    ini=( ${ini[*]/%\\]/ \(} )    # convert text2function (1)
-    ini=( ${ini[*]/=/=\( } )    # convert item to array
-    ini=( ${ini[*]/%/ \)} )     # close array parenthesis
-    ini=( ${ini[*]/%\\ \)/ \\} ) # the multiline trick
-    ini=( ${ini[*]/%\( \)/\(\) \{} ) # convert text2function (2)
-    ini=( ${ini[*]/%\} \)/\}} ) # remove extra parenthesis
-    ini[0]="" # remove first element
-    ini[${#ini[*]} + 1]='}'    # add the last brace
-    eval "$(echo "${ini[*]}")" # eval the result
-}
 
 usage() {
 	sn=`basename $0`
@@ -84,6 +61,7 @@ loadConfig() {
 
 main() {
 	execPath=`pwd`
+	source ./vhosty-helpers
 	loadConfig
 	parameters="--host $hostname --database-type $databaseType"
 	case $CMD in
