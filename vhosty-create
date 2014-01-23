@@ -137,6 +137,8 @@ createJailEnviroment() {
 		echo "DB_NAME='$dataBaseName'" 		>> "$configFilePath"
 		echo "DB_PASS='$databasePassword'" 	>> "$configFilePath"
 		echo "HOST_PER_USER='$hostPerUser'" >> "$configFilePath"
+		echo "OWNER='$userName'" 			>> "$configFilePath"
+		
 	}
 
 	rootPath="$virtualHostsPath"/containers/"$containerName"

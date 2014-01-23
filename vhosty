@@ -58,7 +58,7 @@ loadConfig() {
 	cfg.section.custom
 	if [ "$CMD" == "create" ]
 	then
-		if ["$databaseType" != ""]
+		if [ "$databaseType" != "" ]
 		then
 			cfg.section."$databaseType"
 		else 

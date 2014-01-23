@@ -70,16 +70,22 @@ deleteJailRoot() {
 	}
 
 	deleteHome
+	rm -rf $rootPath
+	sed -i "/$hostname/d" "$virtualHostsPath"/hostlist 
 }
 
 main () {
 	source ./vhosty-helpers
 	containerName=$(findHostByName $hostname $virtualHostsPath)
+
 	rootPath="$virtualHostsPath"/containers/"$containerName"
 	homePath="$rootPath"/home
 
-	cfg_parser "$virtualHostsPath"/hostconfig.ini
+	cfg_parser "$rootPath"/hostconfig.ini
 	cfg.section.main
+
+	deleteJailRoot
+	rm -f "$virtualHostsPath"/"$hostname"
 }
 
 TEMP=`getopt -o h:D:H:j: -l host:,database-host:,jail-roots-path: -n 'vhosty.sh' -- "$@"`
