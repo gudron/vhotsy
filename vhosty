@@ -56,14 +56,23 @@ loadConfig() {
 	cfg_parser "$VHOSTY_CONFIG_FILE_PATH"
 	cfg.section.main
 	cfg.section.custom
-	cfg.section."$databaseType"
+	if [ "$CMD" == "create" ]
+	then
+		if ["$databaseType" != ""]
+		then
+			cfg.section."$databaseType"
+		else 
+			printError
+		fi
+	fi
 }
 
 main() {
 	execPath=`pwd`
 	source ./vhosty-helpers
 	loadConfig
-	parameters="--host $hostname --database-type $databaseType"
+	parameters="--host $hostname \
+--jail-roots-path $WEB_CONF_ROOT"
 	case $CMD in
 		"create" )
 		if [ "$hosttpl" != "" ]
@@ -87,7 +96,7 @@ main() {
 --database-access-user $DB_USER \
 --database-access-password $DB_PASS \
 --database-host $DB_SERVER_ADRESS \
---jail-roots-path $WEB_CONF_ROOT"
+--database-type $databaseType"
 
 			bash -c "$execPath/vhosty-create $parameters"
 		fi
