@@ -1,0 +1,55 @@
+#!/bin/bash
+# ----------------------------------------------------------------------
+#	Copyright (c) 2014
+#
+#	This program is free software; you can redistribute it and/or
+#	modify it under the terms of version 3 of the GNU General Public
+#	License published by the Free Software Foundation.
+#
+#	This program is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+# ----------------------------------------------------------------------
+# Authors:
+#	Alex V Kotelnikov (aka gudron) <gudron@gudron.me>
+#
+# Repository:
+#	https://github.com/gudron/vhotsy
+#
+# /usr/local/bin/vhosty-database
+
+function mysql_create_db {
+
+	DB_NAME="$1"
+	MYSQL_SERVER_ADRESS="$2"
+	MYSQL_ROOT_PASS="$3"
+	CREATE_DB_SQL="CREATE DATABASE \`$DB_NAME\` DEFAULT CHARACTER SET utf8 \
+COLLATE utf8_general_ci;"
+	mysql -u root -h"$MYSQL_SERVER_ADRESS" -p"$MYSQL_ROOT_PASS" -e"$CREATE_DB_SQL"
+}
+
+function mysql_create_db_user {
+
+	DB_NAME="$1"
+	MYSQL_SERVER_ADRESS="$2"
+	MYSQL_ROOT_PASS="$3"
+
+	CREATE_USER_SQL="CREATE USER \`$hostname\`@'%' IDENTIFIED BY  '$pass';"
+
+	GRANTS_USAGE_USER_SQL="GRANT USAGE ON \`$hostname\`.* TO  \`$hostname\`@'%'\
+ IDENTIFIED BY  '$pass' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0\
+ MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;\
+ GRANT USAGE ON \`$hostname\`.* TO  \`$hostname\`@'$MYSQL_SERVER_ADRESS'\
+ IDENTIFIED BY '$pass' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0\
+ MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;"
+
+	GRANTS_PRIV_USER_SQL="GRANT ALL PRIVILEGES ON  \`$hostname\`.* TO \
+ '$hostname'@'%';GRANT ALL PRIVILEGES ON  \`$hostname\`.* TO \
+ '$hostname'@'$MYSQL_SERVER_ADRESS';FLUSH PRIVILEGES;"
+
+	mysql "-u root -h $MYSQL_SERVER_ADRESS\
+ -p$MYSQL_ROOT_PASS \
+ -e $CREATE_USER_SQL$GRANTS_USAGE_USER_SQL$GRANTS_PRIV_USER_SQL"
+}

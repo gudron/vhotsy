@@ -46,14 +46,14 @@ cfg_parser ()
 	eval "$(echo "${ini[*]}")" # eval the result
 }
 
-findHostByName() {
+helper_findHostByName() {
 	# first parameter 	- hostname we are looking for
 	# secondnd paramets - path of "containers" firectory location
 	local containerName=`cat "$virtualHostsPath"/hostlist | grep -m 1 "$hostname" | awk '{print $2}'`
 	echo "$containerName"
 }
 
-readSiteConfig () {
+helper_readSiteConfig () {
 	filePath="$1"
 	cfg_parser "$filePath"
 }

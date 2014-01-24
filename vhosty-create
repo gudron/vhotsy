@@ -152,9 +152,16 @@ createJailEnviroment() {
 	hostListFile="hostlist"
 	touch "$virtualHostsPath"/"$hostListFile"
 	echo "$hostname $containerName" >> "$virtualHostsPath"/"$hostListFile"
-
 	createHostConfig
+	
 	createHome
+}
+
+createDatabase () {
+	source ./vhosty-database
+
+	`"$databaseType_create_db $dataBaseName\
+ $databaseHost $databaseAccessPassword"`
 }
 
 createUser() {

@@ -76,7 +76,7 @@ deleteJailRoot() {
 
 main () {
 	source ./vhosty-helpers
-	containerName=$(findHostByName $hostname $virtualHostsPath)
+	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
 
 	rootPath="$virtualHostsPath"/containers/"$containerName"
 	homePath="$rootPath"/home
