@@ -38,24 +38,12 @@ rootPath=""
 usage() {
 	sn=`basename $0`
 
-	echo "USAGE: $sn -h <HOST_NAME> -D <DATABASE_TYPE> -u <DATABASE_USER>\
-		-U <PASSWORD_FOR_DATABASE_USER>"
-
-	echo "USAGE: $sn --host <HOST_NAME> --database-password <DATABASE_PASSWORD>"	
-	echo "USAGE: $sn -h <HOST_NAME>"
+	echo "USAGE: $sn -h <HOST_NAME> -j <PATH_TO_VHOSTS_PARENT_DIR>"
 	echo -e "Options:"
 	echo -e "\t-h | --host <HOST_NAME>\tName of virtual host.\tExample:\
  example.dev,example.loc"
-
-	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
- Available: mysql"
-
-	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser\
- name who can create databse and grants priveleges. Example: root."
-
-	echo -e "\t-U | --database-access-password\
- <USER_PASSWORD_TO_DATABASE_ACCESS>\tPassword for user who can create\
- database and grants priveleges. Example: superSecredPaswword."
+ 	echo -e "\t-j | --jail-roots-path <PATH_TO_VHOSTS_PARENT_DIR>\tPath to\
+ parent directory of all virtual hosts. Example: /var/www/"
  
 }
 
