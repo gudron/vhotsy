@@ -32,6 +32,7 @@ owner=""
 
 userName=""
 containerName=""
+databaseUserName=""
 homePath=""
 rootPath=""
 
@@ -131,13 +132,15 @@ createJailEnviroment() {
 		configFileName="hostconfig.ini"
 		configFilePath="$rootPath"/"$configFileName"
 		touch "$rootPath"/"$configFileName"
-		echo "[main]" 						 > "$configFilePath"
-		echo "SITE_NAME='$hostname'" 		>> "$configFilePath"
-		echo "DB_TYPE='$databaseType'" 		>> "$configFilePath"
-		echo "DB_NAME='$dataBaseName'" 		>> "$configFilePath"
-		echo "DB_PASS='$databasePassword'" 	>> "$configFilePath"
-		echo "HOST_PER_USER='$hostPerUser'" >> "$configFilePath"
-		echo "OWNER='$userName'" 			>> "$configFilePath"
+		echo "[main]" 								 > "$configFilePath"
+		echo "SITE_NAME='$hostname'" 				>> "$configFilePath"
+		echo "DB_TYPE='$databaseType'" 				>> "$configFilePath"
+		echo "DB_NAME='$dataBaseName'" 				>> "$configFilePath"
+		echo "DB_USER_NAME='$databaseUserName'"		>> "$configFilePath"
+		echo "DB_PASS='$databasePassword'" 			>> "$configFilePath"
+		echo "DB_HOST='$databaseHost'" 				>> "$configFilePath"
+		echo "HOST_PER_USER='$hostPerUser'"			>> "$configFilePath"
+		echo "OWNER='$userName'" 					>> "$configFilePath"
 		
 	}
 
@@ -157,11 +160,19 @@ createJailEnviroment() {
 	createHome
 }
 
-createDatabase () {
+createDatabaseEnviroment () {
 	source ./vhosty-database
+	# Create database, example of real comand:
+	#	mysql_create_db
+	#	postgre_crate_db
+	comand="$databaseType"_create_db
+	$comand $dataBaseName $databaseHost $databaseAccessPassword
 
-	`"$databaseType_create_db $dataBaseName\
- $databaseHost $databaseAccessPassword"`
+	# Create database user, example of real comand:
+	#	mysql_create_db
+	#	postgre_crate_db
+	comand="$databaseType"_create_db_user
+ 	$comand $dataBaseName $databaseHost $databaseAccessPassword $databaseUserName
 }
 
 createUser() {
@@ -180,7 +191,8 @@ main() {
 	# get short sha1 hash from hostname, first 7 character;
 	# 0caaf24ab1a0c33440c06afe99df986365b0781f -> 0caaf24
 	dataBaseName=${containerName::7}
-	if hostPerUser;
+	databaseUserName=${containerName:7:7}
+	if $hostPerUser ;
 		then 
 		userName=dataBaseName
 		createUser
@@ -195,9 +207,10 @@ main() {
 	fi
 	
 	createJailEnviroment
+	createDatabaseEnviroment
 }
 
-TEMP=`getopt -o h:p:P:t:j:D:H: -l host:,password:,database-password:,template:,jail-roots-path:,database-type:,database-host:,database-access-user:,database-access-password:,owner: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o h:p:P:t:j:D:H:u:U: -l host:,password:,database-password:,template:,jail-roots-path:,database-type:,database-host:,database-access-user:,database-access-password:,owner: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 

@@ -21,11 +21,14 @@
 #
 # /usr/local/bin/vhosty-helper
 
+VHOSTY_CONFIG_FILE_PATH="/etc/vhosty.ini" #
+
 cfg_parser ()
 {
 #	thx 2 ajdiaz. 
 #	This function get from 
 #	http://ajdiaz.wordpress.com/2008/02/09/bash-ini-parser/
+	prefix="$2"
 	ini="$(<$1)"                # read the file
 	ini="${ini//[/\[}"          # escape [
 	ini="${ini//]/\]}"          # escape ]
@@ -34,7 +37,7 @@ cfg_parser ()
 	ini=( ${ini[*]/\    =/=} )  # remove tabs before =
 	ini=( ${ini[*]/=\   /=} )   # remove tabs be =
 	ini=( ${ini[*]/\ =\ /=} )   # remove anything with a space around =
-	ini=( ${ini[*]/#\\[/\}$'\n'cfg.section.} ) # set section prefix
+	ini=( ${ini[*]/#\\[/\}$'\n'"$prefix".section.} ) # set section prefix
 	ini=( ${ini[*]/%\\]/ \(} )    # convert text2function (1)
 	ini=( ${ini[*]/=/=\( } )    # convert item to array
 	ini=( ${ini[*]/%/ \)} )     # close array parenthesis

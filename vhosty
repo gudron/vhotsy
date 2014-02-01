@@ -19,7 +19,6 @@
 #	https://github.com/gudron/vhotsy
 #
 # /usr/local/bin/vhosty
-VHOSTY_CONFIG_FILE_PATH="/etc/vhosty.ini" #
 
 hostname=""
 CMD=""
@@ -53,7 +52,7 @@ printError() {
 }
 
 loadConfig() {
-	cfg_parser "$VHOSTY_CONFIG_FILE_PATH"
+	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "cfg"
 	cfg.section.main
 	cfg.section.custom
 	if [ "$CMD" == "create" ]
@@ -85,7 +84,7 @@ main() {
 				then
 				parameters="$parameters --database-password $databasePassword" 
 			fi
-			if hostPerUser;
+			if $hostPerUser ;
 				then 
 				parameters="$parameters --host-pre-user"
 				else 
@@ -93,11 +92,10 @@ main() {
 			fi
 			parameters="$parameters --password $password\
 --template $hosttpl \
---database-access-user $DB_USER \
---database-access-password $DB_PASS \
+--database-type $databaseType \
 --database-host $DB_SERVER_ADRESS \
---database-type $databaseType"
-
+--database-access-user $DB_USER \
+--database-access-password $DB_PASS"
 			bash -c "$execPath/vhosty-create $parameters"
 		fi
 		;;

@@ -25,6 +25,8 @@ databaseType=""
 databaseAccessUser=""
 databaseAccessPassword=""
 databaseHost=""
+dataBaseName=""
+databaseUserName=""
 hostPerUser=false
 owner=""
 
@@ -47,9 +49,6 @@ usage() {
 
 	echo -e "\t-D | --database-type <DATABASE_TYPE>\tWhat database u want use.\
  Available: mysql"
-
-	echo -e "\t-H | --database-host <DATABASE_SERVER_ADRESS>\tDatabase server\
- name or adress. Example: 127.0.0.1"
 
 	echo -e "\t-u | --database-access-user <USER_NAME_TO_DATABASE_ACCESS>\tUser\
  name who can create databse and grants priveleges. Example: root."
@@ -74,6 +73,16 @@ deleteJailRoot() {
 	sed -i "/$hostname/d" "$virtualHostsPath"/hostlist 
 }
 
+deleteDatabase() {
+	source ./vhosty-database
+
+	comand="$databaseType"_delete_db_user
+	$comand $dataBaseName $databaseHost $databaseAccessPassword $databaseUserName
+
+	comand="$databaseType"_delete_db
+	$comand $dataBaseName $databaseHost $databaseAccessPassword
+}
+
 main () {
 	source ./vhosty-helpers
 	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
@@ -81,14 +90,30 @@ main () {
 	rootPath="$virtualHostsPath"/containers/"$containerName"
 	homePath="$rootPath"/home
 
-	cfg_parser "$rootPath"/hostconfig.ini
+	cfg_parser "$rootPath"/hostconfig.ini "cfg"
 	cfg.section.main
 
+	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "maincfg"
+
+	dataBaseName=$DB_NAME
+	databaseHost=$DB_HOST
+	databaseUserName=$DB_USER_NAME
+
+	databaseType=$DB_TYPE
+
+	maincfg.section."$databaseType"
+
+	databaseAccessUser="$DB_USER"
+	databaseAccessPassword="$DB_PASS"
+
+	deleteDatabase
 	deleteJailRoot
+	
+
 	rm -f "$virtualHostsPath"/"$hostname"
 }
 
-TEMP=`getopt -o h:D:H:j: -l host:,database-host:,jail-roots-path: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o h:j: -l host:,jail-roots-path: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
@@ -97,9 +122,6 @@ while true ; do
 	case "$1" in
 		-h|--host ) 
 			hostname="$2" ; shift 2 ;;
-		
-		-H|--database-host )
-			databaseHost="$2" ; shift 2 ;;			
 
 		-j|--jail-roots-path )
 			virtualHostsPath="$2" ; shift 2 ;;
