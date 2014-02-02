@@ -191,6 +191,8 @@ main() {
 	# get short sha1 hash from hostname, first 7 character;
 	# 0caaf24ab1a0c33440c06afe99df986365b0781f -> 0caaf24
 	dataBaseName=${containerName::7}
+	# get short sha1 hash from hostname, get 7 character after first 7 char;
+	# 0caaf24ab1a0c33440c06afe99df986365b0781f -> ab1a0c3
 	databaseUserName=${containerName:7:7}
 	if $hostPerUser ;
 		then 

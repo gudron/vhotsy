@@ -107,7 +107,7 @@ main() {
 	esac
 }
 
-TEMP=`getopt -o cduh:p:D:P:t: -l create,update,delete,host:,password:,database-type:,database-password:,template: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o cduh:p:D:P:t:J -l create,update,delete,host:,password:,database-type:,database-password:,template:,create-jail: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
