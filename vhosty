@@ -70,8 +70,7 @@ main() {
 	execPath=`pwd`
 	source ./vhosty-helpers
 	loadConfig
-	parameters="--host $hostname \
---jail-roots-path $WEB_CONF_ROOT"
+	parameters="--host $hostname"
 	case $CMD in
 		"create" )
 		if [ "$hosttpl" != "" ]
@@ -95,7 +94,8 @@ main() {
 --database-type $databaseType \
 --database-host $DB_SERVER_ADRESS \
 --database-access-user $DB_USER \
---database-access-password $DB_PASS"
+--database-access-password $DB_PASS \
+--jail-roots-path $WEB_CONF_ROOT"
 			bash -c "$execPath/vhosty-create $parameters"
 		fi
 		;;

@@ -82,6 +82,10 @@ printError() {
 	echo "[!] Invalid option" && usage && exit 1
 }
 
+printErrorHostAllreadyExist() {
+	echo "[!] Host allready exist" && exit 1
+}
+
 createJailEnviroment() {
 	createHome() {
 		homePath="$rootPath"/home
@@ -185,31 +189,39 @@ createUser() {
 }
 
 main() {
-	# get sha1 hash from hostname;
-	# example.com -> 0caaf24ab1a0c33440c06afe99df986365b0781f
-	containerName=`echo -n $hostname | openssl sha1 | awk '{print $2}'`
-	# get short sha1 hash from hostname, first 7 character;
-	# 0caaf24ab1a0c33440c06afe99df986365b0781f -> 0caaf24
-	dataBaseName=${containerName::7}
-	# get short sha1 hash from hostname, get 7 character after first 7 char;
-	# 0caaf24ab1a0c33440c06afe99df986365b0781f -> ab1a0c3
-	databaseUserName=${containerName:7:7}
-	if $hostPerUser ;
-		then 
-		userName=dataBaseName
-		createUser
-		else 
-		userName="$owner"
-		unset owner
-	fi
+	source ./vhosty-helpers
+	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
+	echo $containerName
+	if [ "$containerName" != "" ] 
+	then
+		printErrorHostAllreadyExist
+	else
+		# get sha1 hash from hostname;
+		# example.com -> 0caaf24ab1a0c33440c06afe99df986365b0781f
+		containerName=`echo -n $hostname | openssl sha1 | awk '{print $2}'`
+		# get short sha1 hash from hostname, first 7 character;
+		# 0caaf24ab1a0c33440c06afe99df986365b0781f -> 0caaf24
+		dataBaseName=${containerName::7}
+		# get short sha1 hash from hostname, get 7 character after first 7 char;
+		# 0caaf24ab1a0c33440c06afe99df986365b0781f -> ab1a0c3
+		databaseUserName=${containerName:7:7}
+		if $hostPerUser ;
+			then 
+			userName=dataBaseName
+			createUser
+			else 
+			userName="$owner"
+			unset owner
+		fi
 
-	if [ "$databasePassword" == "" ] 
-		then	
-		databasePassword=`</dev/urandom tr -dc '0123456789a-zA-Z' | head -c12`
+		if [ "$databasePassword" == "" ] 
+			then	
+			databasePassword=`</dev/urandom tr -dc '0123456789a-zA-Z' | head -c12`
+		fi
+		
+		createJailEnviroment
+		createDatabaseEnviroment
 	fi
-	
-	createJailEnviroment
-	createDatabaseEnviroment
 }
 
 TEMP=`getopt -o h:p:P:t:j:D:H:u:U: -l host:,password:,database-password:,template:,jail-roots-path:,database-type:,database-host:,database-access-user:,database-access-password:,owner: -n 'vhosty.sh' -- "$@"`

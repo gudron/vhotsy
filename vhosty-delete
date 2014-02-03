@@ -72,30 +72,30 @@ deleteDatabase() {
 main () {
 	source ./vhosty-helpers
 
+	#loading main vhosty config
+	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "maincfg"
+	#parse main vhosty database config
+	maincfg.section.main
+	virtualHostsPath="$WEB_CONF_ROOT"
+	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
+
+	rootPath="$virtualHostsPath"/containers/"$containerName"
+	homePath="$rootPath"/home
+
 	#loading host config
 	cfg_parser "$rootPath"/hostconfig.ini "cfg"
 	cfg.section.main
-
-	#loading main vhosty config
-	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "maincfg"
 
 	dataBaseName=$DB_NAME
 	databaseHost=$DB_HOST
 	databaseUserName=$DB_USER_NAME
 
 	databaseType=$DB_TYPE
-	#parse main vhosty database config
-	maincfg.section.main
+
 	maincfg.section."$databaseType"
 
 	databaseAccessUser="$DB_USER"
 	databaseAccessPassword="$DB_PASS"
-	virtualHostsPath="$WEB_CONF_ROOT"
-
-	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
-
-	rootPath="$virtualHostsPath"/containers/"$containerName"
-	homePath="$rootPath"/home
 
 	deleteDatabase
 	deleteJailRoot
