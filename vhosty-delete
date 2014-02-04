@@ -49,6 +49,10 @@ printError() {
 	echo "[!] Invalid option" && usage && exit 1
 }
 
+printErrorNotExist() {
+	echo "[!] Host $hostname not found" && exit 1
+}
+
 deleteJailRoot() {
 	deleteHome() {
 		rm -rf $homePath
@@ -69,16 +73,7 @@ deleteDatabase() {
 	$comand $dataBaseName $databaseHost $databaseAccessPassword
 }
 
-main () {
-	source ./vhosty-helpers
-
-	#loading main vhosty config
-	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "maincfg"
-	#parse main vhosty database config
-	maincfg.section.main
-	virtualHostsPath="$WEB_CONF_ROOT"
-	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
-
+run () {
 	rootPath="$virtualHostsPath"/containers/"$containerName"
 	homePath="$rootPath"/home
 
@@ -102,6 +97,25 @@ main () {
 	
 
 	rm -f "$virtualHostsPath"/"$hostname"
+}
+
+main () {
+	source ./vhosty-helpers
+
+	#loading main vhosty config
+	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "maincfg"
+	#parse main vhosty database config
+	maincfg.section.main
+	virtualHostsPath="$WEB_CONF_ROOT"
+	echo $hostname $virtualHostsPath
+	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
+
+	if [ "$containerName" == "" ] 
+	then
+		printErrorNotExist
+	else
+		run
+	fi
 }
 
 TEMP=`getopt -o h: -l host: -n 'vhosty.sh' -- "$@"`

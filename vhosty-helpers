@@ -51,8 +51,8 @@ cfg_parser ()
 
 helper_findHostByName() {
 	# first parameter 	- hostname we are looking for
-	# secondnd paramets - path of "containers" firectory location
-	local containerName=`cat "$virtualHostsPath"/hostlist | grep -m 1 "$hostname" | awk '{print $2}'`
+	# secondnd paramets - path of "containers" directory location
+	local containerName=`cat "$2"/hostlist | grep -m 1 "$1" | awk '{print $2}'`
 	echo "$containerName"
 }
 

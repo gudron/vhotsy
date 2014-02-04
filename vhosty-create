@@ -83,7 +83,8 @@ printError() {
 }
 
 printErrorHostAllreadyExist() {
-	echo "[!] Host allready exist" && exit 1
+	echo "[!] Host $hostname allready exists in path: " 
+	echo "$virtualHostsPath/$containerName" && exit 1
 }
 
 createJailEnviroment() {
