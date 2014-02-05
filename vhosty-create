@@ -82,11 +82,6 @@ printError() {
 	echo "[!] Invalid option" && usage && exit 1
 }
 
-printErrorHostAllreadyExist() {
-	echo "[!] Host $hostname allready exists in path: " 
-	echo "$virtualHostsPath/$containerName" && exit 1
-}
-
 createJailEnviroment() {
 	createHome() {
 		homePath="$rootPath"/home
@@ -195,7 +190,7 @@ main() {
 	echo $containerName
 	if [ "$containerName" != "" ] 
 	then
-		printErrorHostAllreadyExist
+		error_printHostAlreadyExist
 	else
 		# get sha1 hash from hostname;
 		# example.com -> 0caaf24ab1a0c33440c06afe99df986365b0781f

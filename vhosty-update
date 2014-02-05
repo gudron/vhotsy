@@ -20,3 +20,67 @@
 #	https://github.com/gudron/vhotsy
 #
 # /usr/local/bin/vhosty-update
+
+virtualHostsPath=""
+databaseType=""
+databaseAccessUser=""
+databaseAccessPassword=""
+databaseHost=""
+dataBaseName=""
+databaseUserName=""
+hostPerUser=false
+owner=""
+
+userName=""
+containerName=""
+homePath=""
+rootPath=""
+
+
+run () {
+
+}
+
+main () {
+	source ./vhosty-helpers
+
+	#loading main vhosty config
+	cfg_parser "$VHOSTY_CONFIG_FILE_PATH" "maincfg"
+	#parse main vhosty database config
+	maincfg.section.main
+	virtualHostsPath="$WEB_CONF_ROOT"
+	echo $hostname $virtualHostsPath
+	containerName=$(helper_findHostByName $hostname $virtualHostsPath)
+
+	if [ "$containerName" == "" ] 
+	then
+		error_printHostNotFound
+	else
+		run
+	fi
+}
+
+TEMP=`getopt -o h:n: -l host:new-host: -n 'vhosty.sh' -- "$@"`
+
+if [ $? != 0 ] ; then printError ; fi
+
+eval set -- "$TEMP"
+while true ; do
+	case "$1" in
+		-h|--host ) 
+			hostname="$2" ; shift 2 ;;
+		-n|--new-host ) 
+			hostname="$2" ; shift 2 ;;
+
+
+		-- ) shift ; break ;;
+		* ) printError;;
+	esac
+done
+
+if [ "$hostname" != "" ]
+then
+	main
+else
+	printError
+fi

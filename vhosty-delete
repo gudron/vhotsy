@@ -49,10 +49,6 @@ printError() {
 	echo "[!] Invalid option" && usage && exit 1
 }
 
-printErrorNotExist() {
-	echo "[!] Host $hostname not found" && exit 1
-}
-
 deleteJailRoot() {
 	deleteHome() {
 		rm -rf $homePath
@@ -112,7 +108,7 @@ main () {
 
 	if [ "$containerName" == "" ] 
 	then
-		printErrorNotExist
+		error_printHostNotFound
 	else
 		run
 	fi

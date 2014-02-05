@@ -21,6 +21,7 @@
 # /usr/local/bin/vhosty
 
 hostname=""
+newHostname=""
 CMD=""
 hosttpl=""
 password=""
@@ -103,11 +104,17 @@ main() {
 		bash -c "$execPath/vhosty-delete $parameters"
 		;;
 		"update" )
+		if [ "$newHostname" == "" ]
+			then
+			printError
+		fi
+		parameters="$parameters --new-host $newHostname"
+		bash -c "$execPath/vhosty-update $parameters"
 		;;
 	esac
 }
 
-TEMP=`getopt -o cduh:p:D:P:t:J -l create,update,delete,host:,password:,database-type:,database-password:,template:,create-jail: -n 'vhosty.sh' -- "$@"`
+TEMP=`getopt -o cduh:n:p:D:P:t:J -l create,update,delete,host:,password:,database-type:,database-password:,template:,create-jail: -n 'vhosty.sh' -- "$@"`
 
 if [ $? != 0 ] ; then printError ; fi
 
@@ -119,7 +126,8 @@ while true ; do
 		-u|--update ) CMD="update" ; shift ;;
 		-h|--host ) 
 			hostname="$2" ; shift 2 ;;
-		
+		-n|--new-host ) 
+			newHostname="$2" ; shift 2 ;;
 		-P|--password ) 
 			password="$2" ; shift 2 ;;
 		

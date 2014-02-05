@@ -60,3 +60,14 @@ helper_readSiteConfig () {
 	filePath="$1"
 	cfg_parser "$filePath"
 }
+
+error_printHostNotFound() {
+	#hostname - first parameter
+	echo "[!] Host $1 not found" && exit 1
+}
+
+error_printHostAlreadyExist() {
+	#hostname - first parameter
+	echo "[!] Host $1 allready exists in path: " 
+	echo "$virtualHostsPath/$containerName" && exit 
+}
